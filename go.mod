@@ -6,5 +6,3 @@ require (
 	github.com/storezhang/pangu v1.2.7
 	github.com/go-redis/redis/v8 v8.11.0
 )
-
-replace github.com/go-redis/redis/v8 => ../../pkg/mod/github.com/go-redis/redis/v8@v8.11.0
