@@ -1,8 +1,6 @@
 package redis
 
 import (
-	`context`
-
 	`github.com/go-redis/redis/v8`
 	`github.com/storezhang/pangu`
 )
@@ -13,22 +11,37 @@ func newRedis(config *pangu.Config) (client *Client, err error) {
 		return
 	}
 
-	options := &redis.Options{
-		Addr:     panguConfig.Redis.Addr,
-		Username: panguConfig.Redis.Username,
-		Password: panguConfig.Redis.Password,
-		DB:       panguConfig.Redis.DB,
-	}
+	redisConfig := panguConfig.Redis
 
-	redisClient := redis.NewClient(options)
-
-	if panguConfig.Redis.Ping {
-		if _, err = redisClient.Ping(context.Background()).Result(); nil != err {
-			return
+	// 加载默认连接
+	optionsCache := make(map[string]*redis.Options)
+	if "" != redisConfig.Addr {
+		defaultOptions := &redis.Options{
+			Addr:     redisConfig.Addr,
+			Username: redisConfig.Options.Username,
+			Password: redisConfig.Options.Password,
+			DB:       redisConfig.Options.DB,
 		}
+
+		optionsCache[defaultLabel] = defaultOptions
 	}
 
-	client = &Client{Client: redisClient}
+	// 加载带标签的服务器
+	for _, server := range redisConfig.Servers {
+		serverOptions := &redis.Options{
+			Addr:     mustString(server.Addr, redisConfig.Addr),
+			Username: mustString(server.Options.Username, redisConfig.Options.Username),
+			Password: mustString(server.Options.Password, redisConfig.Options.Password),
+			DB:       mustInt(server.Options.DB, redisConfig.Options.DB),
+		}
+
+		optionsCache[server.Label] = serverOptions
+	}
+
+	client = &Client{
+		clientCache:  make(map[string]*redis.Client),
+		optionsCache: optionsCache,
+	}
 
 	return
 }

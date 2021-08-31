@@ -1,15 +1,10 @@
 package redis
 
 type config struct {
-	// 服务器地址
-	Addr string `json:"addr" yaml:"addr" validate:"required"`
-	// 授权，用户名
-	Username string `json:"username" yaml:"username"`
-	// 授权，密码
-	Password string `json:"password" yaml:"password"`
-	// 数据库编号
-	DB int `json:"db" yaml:"db"`
-
-	// 是否连接时使用Ping测试数据库连接是否完好
-	Ping bool `json:"ping" yaml:"ping"`
+	// 地址
+	Addr string `json:"addr" yaml:"addr" xml:"addr" toml:"addr" validate:"required_without=Servers,hostname_port"`
+	// 服务器列表
+	Servers []server `json:"servers" yaml:"servers" xml:"servers" validate:"required_without=Addr,dive"`
+	// 选项
+	Options redisOptions `json:"options" yaml:"options" xml:"options" toml:"options"`
 }

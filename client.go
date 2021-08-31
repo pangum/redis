@@ -1,56 +1,131 @@
 package redis
 
 import (
-	`context`
 	`encoding/json`
+	`encoding/xml`
+	`reflect`
+	`strconv`
+	`sync`
 	`time`
 
 	`github.com/go-redis/redis/v8`
 	`github.com/golang/protobuf/proto`
+	`github.com/vmihailenco/msgpack/v5`
 )
 
+// Client Redis客户端
 type Client struct {
-	*redis.Client
+	clientCache  map[string]*redis.Client
+	optionsCache map[string]*redis.Options
+
+	mutex sync.Mutex
 }
 
-func (c *Client) Set(key string, value interface{}, expirations ...time.Duration) *redis.StatusCmd {
-	return c.Client.Set(context.Background(), key, value, getExpiration(expirations...))
-}
-
-func (c *Client) SetJSON(key string, value interface{}, expirations ...time.Duration) *redis.StatusCmd {
-	if jsonValue, err := json.Marshal(value); nil == err {
-		return c.Client.Set(context.Background(), key, jsonValue, getExpiration(expirations...))
+func (c *Client) Redis(opts ...option) *redis.Client {
+	options := defaultOptions()
+	for _, opt := range opts {
+		opt.apply(options)
 	}
 
-	return nil
+	return c.getClient(options)
 }
 
-func (c *Client) SetProtobuf(key string, value proto.Message, expirations ...time.Duration) *redis.StatusCmd {
-	if protobuf, err := proto.Marshal(value); nil == err {
-		return c.Client.Set(context.Background(), key, protobuf, getExpiration(expirations...))
+func (c *Client) getClient(options *options) (client *redis.Client) {
+	c.mutex.Lock()
+	defer func() {
+		options.label = defaultLabel
+		c.mutex.Unlock()
+	}()
+
+	var exist bool
+	if client, exist = c.clientCache[options.label]; exist {
+		return
 	}
 
-	return nil
+	client = redis.NewClient(c.optionsCache[options.label])
+	c.clientCache[options.label] = client
+
+	return
 }
 
-func (c *Client) Del(key string) *redis.IntCmd {
-	return c.Client.Del(context.Background(), key)
-}
-
-func (c *Client) Get(key string) string {
-	return c.Client.Get(context.Background(), key).Val()
-}
-
-func (c *Client) IncrBy(key string, value int64, expirations ...time.Duration) int64 {
-	c.Client.Expire(context.Background(), key, getExpiration(expirations...))
-
-	return c.Client.IncrBy(context.Background(), key, value).Val()
-}
-
-func getExpiration(expirations ...time.Duration) time.Duration {
-	if 0 != len(expirations) {
-		return expirations[0]
+func (c *Client) marshal(from interface{}, options *options) (to interface{}, err error) {
+	switch options.format {
+	case formatProto:
+		to, err = proto.Marshal(from.(proto.Message))
+	case formatJson:
+		to, err = json.Marshal(from)
+	case formatXml:
+		to, err = xml.Marshal(from)
+	case formatMsgpack:
+		to, err = msgpack.Marshal(from)
+	case formatBytes:
+		to = from.([]byte)
+	case formatString:
+		to = from.(string)
+	case formatInt:
+		to = from.(int)
+	case formatInt64:
+		to = from.(int64)
+	case formatUint64:
+		to = from.(uint64)
+	case formatBool:
+		to = from.(bool)
+	case formatFloat32:
+		to = from.(float32)
+	case formatFloat64:
+		to = from.(float64)
+	case formatTime:
+		to = from.(time.Time)
 	}
 
-	return 0
+	return
+}
+
+func (c *Client) unmarshal(from string, to interface{}, options *options) (err error) {
+	switch options.format {
+	case formatProto:
+		err = proto.Unmarshal(stringToBytes(from), to.(proto.Message))
+	case formatJson:
+		err = json.Unmarshal(stringToBytes(from), to)
+	case formatXml:
+		err = xml.Unmarshal(stringToBytes(from), to)
+	case formatMsgpack:
+		err = msgpack.Unmarshal(stringToBytes(from), to)
+	case formatBytes:
+		to = stringToBytes(from)
+	case formatString:
+		to = from
+	case formatInt:
+		to, err = strconv.Atoi(from)
+	case formatInt64:
+		to, err = strconv.ParseInt(from, 10, 64)
+	case formatUint64:
+		to, err = strconv.ParseUint(from, 10, 64)
+	case formatBool:
+		to, err = strconv.ParseBool(from)
+	case formatFloat32:
+		to, err = strconv.ParseFloat(from, 32)
+	case formatFloat64:
+		to, err = strconv.ParseFloat(from, 64)
+	case formatTime:
+		to, err = time.Parse(time.RFC3339Nano, from)
+	}
+
+	return
+}
+
+func (c *Client) unmarshalSlice(strings []string, to interface{}, options *options) (err error) {
+	sliceType := reflect.TypeOf(to).Elem()
+	elementType := sliceType.Elem()
+	newTo := reflect.MakeSlice(sliceType, 0, len(strings))
+	for _, str := range strings {
+		value := reflect.New(elementType).Interface()
+		if err = c.unmarshal(str, value, options); nil != err {
+			return
+		}
+		newTo = reflect.Append(newTo, reflect.ValueOf(value).Elem())
+	}
+	reflect.ValueOf(to).Elem().Set(newTo)
+
+	return
 }
