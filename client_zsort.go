@@ -15,7 +15,7 @@ func (c *Client) ZAdd(ctx context.Context, key string, opts ...sortedSetOption) 
 	zs := make([]*redis.Z, 0, len(options.members))
 	for _, member := range options.members {
 		var marshaled interface{}
-		if marshaled, err = c.marshal(member.value, options.options); nil != err {
+		if marshaled, err = c.marshal(member.value, options.options.format); nil != err {
 			return
 		}
 
@@ -38,7 +38,7 @@ func (c *Client) ZRange(ctx context.Context, key string, values interface{}, opt
 	if cmd := c.getClient(options.options).ZRange(ctx, key, options.start, options.stop); nil != cmd.Err() {
 		err = cmd.Err()
 	} else {
-		err = c.unmarshalSlice(cmd.Val(), &values, options.options)
+		err = c.unmarshalSlice(cmd.Val(), &values, options.options.format)
 	}
 
 	return
@@ -53,7 +53,7 @@ func (c *Client) ZRandMember(ctx context.Context, key string, values interface{}
 	if cmd := c.getClient(options.options).ZRandMember(ctx, key, options.count, options.withScores); nil != cmd.Err() {
 		err = cmd.Err()
 	} else {
-		err = c.unmarshalSlice(cmd.Val(), &values, options.options)
+		err = c.unmarshalSlice(cmd.Val(), &values, options.options.format)
 	}
 
 	return
@@ -66,6 +66,30 @@ func (c *Client) ZCard(ctx context.Context, key string, opts ...sortedSetOption)
 	}
 
 	if redisCmd := c.getClient(options.options).ZCard(ctx, key); nil != redisCmd.Err() {
+		err = redisCmd.Err()
+	} else {
+		total = redisCmd.Val()
+	}
+
+	return
+}
+
+func (c *Client) ZRem(ctx context.Context, key string, opts ...sortedSetOption) (total int64, err error) {
+	options := defaultSortedSetOptions()
+	for _, opt := range opts {
+		opt.applySortedSet(options)
+	}
+
+	values := make([]interface{}, 0, len(options.values))
+	for _, value := range options.values {
+		var marshaled interface{}
+		if marshaled, err = c.marshal(value, options.options.format); nil != err {
+			return
+		}
+
+		values = append(values, marshaled)
+	}
+	if redisCmd := c.getClient(options.options).ZRem(ctx, key, values...); nil != redisCmd.Err() {
 		err = redisCmd.Err()
 	} else {
 		total = redisCmd.Val()

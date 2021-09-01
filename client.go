@@ -48,8 +48,8 @@ func (c *Client) getClient(options *options) (client *redis.Client) {
 	return
 }
 
-func (c *Client) marshal(from interface{}, options *options) (to interface{}, err error) {
-	switch options.format {
+func (c *Client) marshal(from interface{}, format format) (to interface{}, err error) {
+	switch format {
 	case formatProto:
 		to, err = proto.Marshal(from.(proto.Message))
 	case formatJson:
@@ -81,8 +81,8 @@ func (c *Client) marshal(from interface{}, options *options) (to interface{}, er
 	return
 }
 
-func (c *Client) unmarshal(from string, to interface{}, options *options) (err error) {
-	switch options.format {
+func (c *Client) unmarshal(from string, to interface{}, format format) (err error) {
+	switch format {
 	case formatProto:
 		err = proto.Unmarshal(stringToBytes(from), to.(proto.Message))
 	case formatJson:
@@ -114,13 +114,13 @@ func (c *Client) unmarshal(from string, to interface{}, options *options) (err e
 	return
 }
 
-func (c *Client) unmarshalSlice(strings []string, to interface{}, options *options) (err error) {
+func (c *Client) unmarshalSlice(strings []string, to interface{}, format format) (err error) {
 	sliceType := reflect.TypeOf(to).Elem()
 	elementType := sliceType.Elem()
 	newTo := reflect.MakeSlice(sliceType, 0, len(strings))
 	for _, str := range strings {
 		value := reflect.New(elementType).Interface()
-		if err = c.unmarshal(str, value, options); nil != err {
+		if err = c.unmarshal(str, value, format); nil != err {
 			return
 		}
 		newTo = reflect.Append(newTo, reflect.ValueOf(value).Elem())

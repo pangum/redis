@@ -15,6 +15,14 @@ func Between(start int64, stop int64) *optionBetween {
 	}
 }
 
+// Page 模拟分页
+func Page(page int64, size int64) *optionBetween {
+	return &optionBetween{
+		start: (page - 1) * size,
+		stop:  page*size - 1,
+	}
+}
+
 func (b *optionBetween) applySortedSet(options *sortedSetOptions) {
 	options.start = b.start
 }

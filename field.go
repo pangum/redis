@@ -1,6 +1,7 @@
 package redis
 
 type field struct {
-	key   string
-	value interface{}
+	key    string
+	value  interface{}
+	format format
 }

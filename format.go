@@ -1,6 +1,7 @@
 package redis
 
 const (
+	formatUnknown format = ""
 	formatJson    format = "json"
 	formatProto   format = "proto"
 	formatMsgpack format = "msgpack"

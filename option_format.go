@@ -108,3 +108,7 @@ func (f *optionFormat) applySortedSet(options *sortedSetOptions) {
 func (f *optionFormat) applyHash(options *hashOptions) {
 	options.format = f.format
 }
+
+func (f *optionFormat) applyField(options *fieldOptions) {
+	options.format = f.format
+}

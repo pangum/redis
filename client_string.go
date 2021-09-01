@@ -12,7 +12,7 @@ func (c *Client) Set(ctx context.Context, key string, value interface{}, opts ..
 		opt.apply(options)
 	}
 
-	if value, err = c.marshal(value, options); nil != err {
+	if value, err = c.marshal(value, options.format); nil != err {
 		return
 	}
 	err = c.getClient(options).Set(ctx, key, value, options.expiration).Err()
@@ -34,7 +34,7 @@ func (c *Client) Get(ctx context.Context, key string, value interface{}, opts ..
 	if cmd = c.getClient(options).Get(ctx, key); nil != cmd.Err() {
 		err = cmd.Err()
 	} else {
-		err = c.unmarshal(cmd.Val(), value, options)
+		err = c.unmarshal(cmd.Val(), value, options.format)
 	}
 
 	return
