@@ -2,7 +2,7 @@ package redis
 
 type (
 	fieldOptions struct {
-		format format
+		serializer serializer
 	}
 
 	fieldOption interface {
@@ -12,6 +12,6 @@ type (
 
 func defaultFieldOptions() *fieldOptions {
 	return &fieldOptions{
-		format: formatUnknown,
+		serializer: serializerUnknown,
 	}
 }

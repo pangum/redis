@@ -7,23 +7,23 @@ import (
 )
 
 func (c *Client) Set(ctx context.Context, key string, value interface{}, opts ...option) (err error) {
-	options := defaultOptions()
+	_options := defaultOptions()
 	for _, opt := range opts {
-		opt.apply(options)
+		opt.apply(_options)
 	}
 
-	if value, err = c.marshal(value, options.format); nil != err {
+	if value, err = c.marshal(value, _options.label, _options.serializer); nil != err {
 		return
 	}
-	err = c.getClient(options).Set(ctx, key, value, options.expiration).Err()
+	err = c.getClient(_options).Set(ctx, key, value, _options.expiration).Err()
 
 	return
 }
 
 func (c *Client) Get(ctx context.Context, key string, value interface{}, opts ...option) (exist bool, err error) {
-	options := defaultOptions()
+	_options := defaultOptions()
 	for _, opt := range opts {
-		opt.apply(options)
+		opt.apply(_options)
 	}
 
 	var cmd *redis.StringCmd
@@ -31,10 +31,10 @@ func (c *Client) Get(ctx context.Context, key string, value interface{}, opts ..
 		exist = redis.Nil != cmd.Err()
 	}()
 
-	if cmd = c.getClient(options).Get(ctx, key); nil != cmd.Err() {
+	if cmd = c.getClient(_options).Get(ctx, key); nil != cmd.Err() {
 		err = cmd.Err()
 	} else {
-		err = c.unmarshal(cmd.Val(), value, options.format)
+		err = c.unmarshal(cmd.Val(), value, _options.label, _options.serializer)
 	}
 
 	return

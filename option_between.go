@@ -25,4 +25,10 @@ func Page(page int64, size int64) *optionBetween {
 
 func (b *optionBetween) applySortedSet(options *sortedSetOptions) {
 	options.start = b.start
+	options.stop = b.stop
+}
+
+func (b *optionBetween) applyList(options *listOptions) {
+	options.start = b.start
+	options.stop = b.stop
 }

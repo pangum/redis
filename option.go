@@ -7,7 +7,6 @@ import (
 func defaultOptions() *options {
 	return &options{
 		label:      defaultLabel,
-		format:     formatJson,
 		expiration: -1,
 	}
 }
@@ -19,7 +18,7 @@ type (
 
 	options struct {
 		label      string
-		format     format
+		serializer serializer
 		expiration time.Duration
 	}
 )

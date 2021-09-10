@@ -14,13 +14,13 @@ func (c *Client) HSet(ctx context.Context, key string, opts ...hashOption) (affe
 
 	values := make([]interface{}, 0, 2*len(_options.fields))
 	for _, _field := range _options.fields {
-		_format := _field.format
-		if formatUnknown == _format {
-			_format = _options.options.format
+		_serializer := _field.serializer
+		if serializerUnknown == _serializer {
+			_serializer = _options.serializer
 		}
 
 		var marshaled interface{}
-		if marshaled, err = c.marshal(_field.value, _format); nil != err {
+		if marshaled, err = c.marshal(_field.value, _options.label, _serializer); nil != err {
 			return
 		}
 		values = append(values, _field.key, marshaled)
@@ -44,7 +44,7 @@ func (c *Client) HGet(ctx context.Context, key string, field string, value inter
 	if cmd = c.getClient(_options.options).HGet(ctx, key, field); nil != cmd.Err() {
 		err = cmd.Err()
 	} else {
-		err = c.unmarshal(cmd.Val(), value, _options.format)
+		err = c.unmarshal(cmd.Val(), value, _options.label, _options.serializer)
 	}
 
 	return

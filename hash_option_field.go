@@ -5,27 +5,27 @@ var _ hashOption = (*hashOptionField)(nil)
 type hashOptionField struct {
 	key    string
 	value  interface{}
-	format format
+	format serializer
 }
 
 // Field 配置字段
 func Field(key string, value interface{}, opts ...fieldOption) *hashOptionField {
-	options := defaultFieldOptions()
+	_options := defaultFieldOptions()
 	for _, opt := range opts {
-		opt.applyField(options)
+		opt.applyField(_options)
 	}
 
 	return &hashOptionField{
 		key:    key,
 		value:  value,
-		format: options.format,
+		format: _options.serializer,
 	}
 }
 
 func (f *hashOptionField) applyHash(options *hashOptions) {
 	options.fields = append(options.fields, &field{
-		key:    f.key,
-		value:  f.value,
-		format: f.format,
+		key:        f.key,
+		value:      f.value,
+		serializer: f.format,
 	})
 }

@@ -5,11 +5,20 @@ type (
 		applySortedSet(options *sortedSetOptions)
 	}
 
-	sortedSetOptions struct {
+	sortedSetAddOption interface {
+		applySortedSetAdd(options *sortedSetAddOptions)
+	}
+
+	sortedSetAddOptions struct {
 		*options
 
 		members []*member
-		values  []interface{}
+	}
+
+	sortedSetOptions struct {
+		*options
+
+		values []interface{}
 
 		count      int
 		withScores bool
@@ -19,12 +28,19 @@ type (
 	}
 )
 
+func defaultSortedSetAddOptions() *sortedSetAddOptions {
+	return &sortedSetAddOptions{
+		options: defaultOptions(),
+
+		members: make([]*member, 0, 0),
+	}
+}
+
 func defaultSortedSetOptions() *sortedSetOptions {
 	return &sortedSetOptions{
 		options: defaultOptions(),
 
-		members: make([]*member, 0, 0),
-		values:  make([]interface{}, 0, 0),
+		values: make([]interface{}, 0, 0),
 
 		count:      1,
 		withScores: true,
