@@ -38,7 +38,7 @@ func (c *Client) ZRange(ctx context.Context, key string, values interface{}, opt
 	if cmd := c.getClient(_options.options).ZRange(ctx, key, _options.start, _options.stop); nil != cmd.Err() {
 		err = cmd.Err()
 	} else {
-		err = c.unmarshalSlice(cmd.Val(), &values, _options.label, _options.serializer)
+		err = c.unmarshalSlice(cmd.Val(), values, _options.label, _options.serializer)
 	}
 
 	return
