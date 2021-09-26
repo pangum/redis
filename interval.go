@@ -9,15 +9,15 @@ type interval struct {
 }
 
 // Close 闭区间
-func Close(value float64) *interval {
+func Close(value int64) *interval {
 	return &interval{
-		interval: fmt.Sprintf("%f", value),
+		interval: fmt.Sprintf("%d", value),
 	}
 }
 
 // Open 开区间
-func Open(value float64) *interval {
+func Open(value int64) *interval {
 	return &interval{
-		interval: fmt.Sprintf("(%f", value),
+		interval: fmt.Sprintf("(%d", value),
 	}
 }
