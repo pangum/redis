@@ -4,10 +4,10 @@ import (
 	`context`
 )
 
-func (c *Client) RPush(ctx context.Context, key string, opts ...listOption) (affected int64, err error) {
-	_options := defaultListOptions()
+func (c *Client) RPush(ctx context.Context, key string, opts ...valuesOption) (affected int64, err error) {
+	_options := defaultValuesOptions()
 	for _, opt := range opts {
-		opt.applyList(_options)
+		opt.applyValues(_options)
 	}
 
 	values := make([]interface{}, 0, len(_options.values))
@@ -24,10 +24,10 @@ func (c *Client) RPush(ctx context.Context, key string, opts ...listOption) (aff
 	return
 }
 
-func (c *Client) LRange(ctx context.Context, key string, values interface{}, opts ...listOption) (err error) {
-	_options := defaultListOptions()
+func (c *Client) LRange(ctx context.Context, key string, values interface{}, opts ...rangeOption) (err error) {
+	_options := defaultRangeOptions()
 	for _, opt := range opts {
-		opt.applyList(_options)
+		opt.applyRange(_options)
 	}
 
 	if cmd := c.getClient(_options.options).LRange(ctx, key, _options.start, _options.stop); nil != cmd.Err() {

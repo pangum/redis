@@ -101,18 +101,10 @@ func (s *optionSerializer) apply(options *options) {
 	options.serializer = s.serializer
 }
 
-func (s *optionSerializer) applySortedSet(options *sortedSetOptions) {
-	options.serializer = s.serializer
-}
-
 func (s *optionSerializer) applyHash(options *hashOptions) {
 	options.serializer = s.serializer
 }
 
 func (s *optionSerializer) applyField(options *fieldOptions) {
-	options.serializer = s.serializer
-}
-
-func (s *optionSerializer) applySet(options *setOptions) {
 	options.serializer = s.serializer
 }

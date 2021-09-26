@@ -1,18 +1,29 @@
 package redis
 
-var _ sortedSetOption = (*optionCount)(nil)
+var _ countOption = (*optionCount)(nil)
 
 type optionCount struct {
-	count int
+	count      int
+	withScores bool
 }
 
 // Count 配置个数
 func Count(count int) *optionCount {
 	return &optionCount{
-		count: count,
+		count:      count,
+		withScores: false,
 	}
 }
 
-func (c *optionCount) applySortedSet(options *sortedSetOptions) {
+// CountWithScores 配置个数
+func CountWithScores(count int) *optionCount {
+	return &optionCount{
+		count:      count,
+		withScores: true,
+	}
+}
+
+func (c *optionCount) applyCount(options *countOptions) {
 	options.count = c.count
+	options.withScores = c.withScores
 }

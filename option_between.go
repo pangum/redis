@@ -1,6 +1,6 @@
 package redis
 
-var _ sortedSetOption = (*optionBetween)(nil)
+var _ rangeOption = (*optionBetween)(nil)
 
 type optionBetween struct {
 	start int64
@@ -23,12 +23,7 @@ func Page(page int64, size int64) *optionBetween {
 	}
 }
 
-func (b *optionBetween) applySortedSet(options *sortedSetOptions) {
-	options.start = b.start
-	options.stop = b.stop
-}
-
-func (b *optionBetween) applyList(options *listOptions) {
+func (b *optionBetween) applyRange(options *rangeOptions) {
 	options.start = b.start
 	options.stop = b.stop
 }

@@ -23,7 +23,3 @@ func Default() *optionLabel {
 func (l *optionLabel) apply(options *options) {
 	options.label = l.label
 }
-
-func (l *optionLabel) applySortedSet(options *sortedSetOptions) {
-	options.label = l.label
-}

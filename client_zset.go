@@ -6,10 +6,10 @@ import (
 	`github.com/go-redis/redis/v8`
 )
 
-func (c *Client) ZAdd(ctx context.Context, key string, opts ...sortedSetAddOption) (affected int64, err error) {
-	_options := defaultSortedSetAddOptions()
+func (c *Client) ZAdd(ctx context.Context, key string, opts ...membersOption) (affected int64, err error) {
+	_options := defaultMembersOptions()
 	for _, opt := range opts {
-		opt.applySortedSetAdd(_options)
+		opt.applyMembers(_options)
 	}
 
 	zs := make([]*redis.Z, 0, len(_options.members))
@@ -29,10 +29,10 @@ func (c *Client) ZAdd(ctx context.Context, key string, opts ...sortedSetAddOptio
 	return
 }
 
-func (c *Client) ZRange(ctx context.Context, key string, values interface{}, opts ...sortedSetOption) (err error) {
-	_options := defaultSortedSetOptions()
+func (c *Client) ZRange(ctx context.Context, key string, values interface{}, opts ...rangeOption) (err error) {
+	_options := defaultRangeOptions()
 	for _, opt := range opts {
-		opt.applySortedSet(_options)
+		opt.applyRange(_options)
 	}
 
 	if cmd := c.getClient(_options.options).ZRange(ctx, key, _options.start, _options.stop); nil != cmd.Err() {
@@ -44,10 +44,10 @@ func (c *Client) ZRange(ctx context.Context, key string, values interface{}, opt
 	return
 }
 
-func (c *Client) ZRandMember(ctx context.Context, key string, values interface{}, opts ...sortedSetOption) (err error) {
-	_options := defaultSortedSetOptions()
+func (c *Client) ZRandMember(ctx context.Context, key string, values interface{}, opts ...countOption) (err error) {
+	_options := defaultCountOptions()
 	for _, opt := range opts {
-		opt.applySortedSet(_options)
+		opt.applyCount(_options)
 	}
 
 	if cmd := c.getClient(_options.options).ZRandMember(ctx, key, _options.count, _options.withScores); nil != cmd.Err() {
@@ -59,13 +59,13 @@ func (c *Client) ZRandMember(ctx context.Context, key string, values interface{}
 	return
 }
 
-func (c *Client) ZCard(ctx context.Context, key string, opts ...sortedSetOption) (total int64, err error) {
-	_options := defaultSortedSetOptions()
+func (c *Client) ZCard(ctx context.Context, key string, opts ...option) (total int64, err error) {
+	_options := defaultOptions()
 	for _, opt := range opts {
-		opt.applySortedSet(_options)
+		opt.apply(_options)
 	}
 
-	if redisCmd := c.getClient(_options.options).ZCard(ctx, key); nil != redisCmd.Err() {
+	if redisCmd := c.getClient(_options).ZCard(ctx, key); nil != redisCmd.Err() {
 		err = redisCmd.Err()
 	} else {
 		total = redisCmd.Val()
@@ -74,13 +74,13 @@ func (c *Client) ZCard(ctx context.Context, key string, opts ...sortedSetOption)
 	return
 }
 
-func (c *Client) ZCount(ctx context.Context, key string, min string, max string, opts ...sortedSetOption) (total int64, err error) {
-	_options := defaultSortedSetOptions()
+func (c *Client) ZCount(ctx context.Context, key string, opts ...intervalOption) (total int64, err error) {
+	_options := defaultIntervalOptions()
 	for _, opt := range opts {
-		opt.applySortedSet(_options)
+		opt.applyInterval(_options)
 	}
 
-	if redisCmd := c.getClient(_options.options).ZCount(ctx, key, min, max); nil != redisCmd.Err() {
+	if redisCmd := c.getClient(_options.options).ZCount(ctx, key, _options.min.interval, _options.max.interval); nil != redisCmd.Err() {
 		err = redisCmd.Err()
 	} else {
 		total = redisCmd.Val()
@@ -89,10 +89,10 @@ func (c *Client) ZCount(ctx context.Context, key string, min string, max string,
 	return
 }
 
-func (c *Client) ZRem(ctx context.Context, key string, opts ...sortedSetOption) (total int64, err error) {
-	_options := defaultSortedSetOptions()
+func (c *Client) ZRem(ctx context.Context, key string, opts ...valuesOption) (total int64, err error) {
+	_options := defaultValuesOptions()
 	for _, opt := range opts {
-		opt.applySortedSet(_options)
+		opt.applyValues(_options)
 	}
 
 	values := make([]interface{}, 0, len(_options.values))

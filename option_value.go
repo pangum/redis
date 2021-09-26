@@ -1,10 +1,6 @@
 package redis
 
-var (
-	_ sortedSetOption = (*optionValue)(nil)
-	_ setOption       = (*optionValue)(nil)
-	_ listOption      = (*optionValue)(nil)
-)
+var _ valuesOption = (*optionValue)(nil)
 
 type optionValue struct {
 	value interface{}
@@ -24,14 +20,6 @@ func Member(value interface{}) *optionValue {
 	}
 }
 
-func (v *optionValue) applySortedSet(options *sortedSetOptions) {
-	options.values = append(options.values, v.value)
-}
-
-func (v *optionValue) applySet(options *setOptions) {
-	options.members = append(options.members, v.value)
-}
-
-func (v *optionValue) applyList(options *listOptions) {
+func (v *optionValue) applyValues(options *valuesOptions) {
 	options.values = append(options.values, v.value)
 }
