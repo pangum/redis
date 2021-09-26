@@ -43,7 +43,7 @@ func defaultSortedSetOptions() *sortedSetOptions {
 		values: make([]interface{}, 0, 0),
 
 		count:      1,
-		withScores: true,
+		withScores: false,
 
 		start: 1,
 		stop:  1,
