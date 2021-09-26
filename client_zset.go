@@ -74,6 +74,21 @@ func (c *Client) ZCard(ctx context.Context, key string, opts ...sortedSetOption)
 	return
 }
 
+func (c *Client) ZCount(ctx context.Context, key string, min string, max string, opts ...sortedSetOption) (total int64, err error) {
+	_options := defaultSortedSetOptions()
+	for _, opt := range opts {
+		opt.applySortedSet(_options)
+	}
+
+	if redisCmd := c.getClient(_options.options).ZCount(ctx, key, min, max); nil != redisCmd.Err() {
+		err = redisCmd.Err()
+	} else {
+		total = redisCmd.Val()
+	}
+
+	return
+}
+
 func (c *Client) ZRem(ctx context.Context, key string, opts ...sortedSetOption) (total int64, err error) {
 	_options := defaultSortedSetOptions()
 	for _, opt := range opts {
