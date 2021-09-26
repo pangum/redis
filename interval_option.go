@@ -17,7 +17,7 @@ func defaultIntervalOptions() *intervalOptions {
 	return &intervalOptions{
 		options: defaultOptions(),
 
-		min: CloseInterval(1),
-		max: CloseInterval(1),
+		min: Close(1),
+		max: Close(1),
 	}
 }
