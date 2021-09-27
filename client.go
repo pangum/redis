@@ -98,7 +98,8 @@ func (c *Client) unmarshal(from string, to interface{}, label string, serializer
 		toSlice := to.(*[]byte)
 		*toSlice = stringToBytes(from)
 	case serializerString:
-		to = from
+		toString := to.(*string)
+		*toString = from
 	case serializerInt:
 		to, err = strconv.Atoi(from)
 	case serializerInt64:
