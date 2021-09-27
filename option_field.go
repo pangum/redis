@@ -1,28 +1,28 @@
 package redis
 
-var _ hashOption = (*hashOptionField)(nil)
+var _ fieldOption = (*optionField)(nil)
 
-type hashOptionField struct {
+type optionField struct {
 	key    string
 	value  interface{}
 	format serializer
 }
 
 // Field 配置字段
-func Field(key string, value interface{}, opts ...fieldOption) *hashOptionField {
-	_options := defaultFieldOptions()
+func Field(key string, value interface{}, opts ...option) *optionField {
+	_options := defaultOptions()
 	for _, opt := range opts {
-		opt.applyField(_options)
+		opt.apply(_options)
 	}
 
-	return &hashOptionField{
+	return &optionField{
 		key:    key,
 		value:  value,
 		format: _options.serializer,
 	}
 }
 
-func (f *hashOptionField) applyHash(options *hashOptions) {
+func (f *optionField) applyField(options *fieldOptions) {
 	options.fields = append(options.fields, &field{
 		key:        f.key,
 		value:      f.value,

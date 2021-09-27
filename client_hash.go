@@ -6,10 +6,10 @@ import (
 	`github.com/go-redis/redis/v8`
 )
 
-func (c *Client) HSet(ctx context.Context, key string, opts ...hashOption) (affected int64, err error) {
-	_options := defaultHashOptions()
+func (c *Client) HSet(ctx context.Context, key string, opts ...fieldOption) (affected int64, err error) {
+	_options := defaultFieldOptions()
 	for _, opt := range opts {
-		opt.applyHash(_options)
+		opt.applyField(_options)
 	}
 
 	values := make([]interface{}, 0, 2*len(_options.fields))
@@ -30,10 +30,10 @@ func (c *Client) HSet(ctx context.Context, key string, opts ...hashOption) (affe
 	return
 }
 
-func (c *Client) HGet(ctx context.Context, key string, field string, value interface{}, opts ...hashOption) (exist bool, err error) {
-	_options := defaultHashOptions()
+func (c *Client) HGet(ctx context.Context, key string, field string, value interface{}, opts ...option) (exist bool, err error) {
+	_options := defaultOptions()
 	for _, opt := range opts {
-		opt.applyHash(_options)
+		opt.apply(_options)
 	}
 
 	var cmd *redis.StringCmd
@@ -41,7 +41,7 @@ func (c *Client) HGet(ctx context.Context, key string, field string, value inter
 		exist = redis.Nil != cmd.Err()
 	}()
 
-	if cmd = c.getClient(_options.options).HGet(ctx, key, field); nil != cmd.Err() {
+	if cmd = c.getClient(_options).HGet(ctx, key, field); nil != cmd.Err() {
 		err = cmd.Err()
 	} else {
 		err = c.unmarshal(cmd.Val(), value, _options.label, _options.serializer)
@@ -50,12 +50,12 @@ func (c *Client) HGet(ctx context.Context, key string, field string, value inter
 	return
 }
 
-func (c *Client) HIncrBy(ctx context.Context, key string, field string, value int64, opts ...hashOption) (affected int64, err error) {
-	_options := defaultHashOptions()
+func (c *Client) HIncrBy(ctx context.Context, key string, field string, value int64, opts ...option) (affected int64, err error) {
+	_options := defaultOptions()
 	for _, opt := range opts {
-		opt.applyHash(_options)
+		opt.apply(_options)
 	}
-	affected, err = c.getClient(_options.options).HIncrBy(ctx, key, field, value).Result()
+	affected, err = c.getClient(_options).HIncrBy(ctx, key, field, value).Result()
 
 	return
 }

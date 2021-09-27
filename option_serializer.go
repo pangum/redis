@@ -1,6 +1,14 @@
 package redis
 
-var _ option = (*optionSerializer)(nil)
+var (
+	_ option         = (*optionSerializer)(nil)
+	_ valuesOption   = (*optionSerializer)(nil)
+	_ fieldOption    = (*optionSerializer)(nil)
+	_ countOption    = (*optionSerializer)(nil)
+	_ rangeOption    = (*optionSerializer)(nil)
+	_ membersOption  = (*optionSerializer)(nil)
+	_ intervalOption = (*optionSerializer)(nil)
+)
 
 type optionSerializer struct {
 	serializer serializer
@@ -101,10 +109,26 @@ func (s *optionSerializer) apply(options *options) {
 	options.serializer = s.serializer
 }
 
-func (s *optionSerializer) applyHash(options *hashOptions) {
+func (s *optionSerializer) applyField(options *fieldOptions) {
 	options.serializer = s.serializer
 }
 
-func (s *optionSerializer) applyField(options *fieldOptions) {
+func (s *optionSerializer) applyValues(options *valuesOptions) {
+	options.serializer = s.serializer
+}
+
+func (s *optionSerializer) applyRange(options *rangeOptions) {
+	options.serializer = s.serializer
+}
+
+func (s *optionSerializer) applyCount(options *countOptions) {
+	options.serializer = s.serializer
+}
+
+func (s *optionSerializer) applyMembers(options *membersOptions) {
+	options.serializer = s.serializer
+}
+
+func (s *optionSerializer) applyInterval(options *intervalOptions) {
 	options.serializer = s.serializer
 }

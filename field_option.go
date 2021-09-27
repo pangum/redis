@@ -1,17 +1,21 @@
 package redis
 
 type (
-	fieldOptions struct {
-		serializer serializer
-	}
-
 	fieldOption interface {
 		applyField(options *fieldOptions)
+	}
+
+	fieldOptions struct {
+		*options
+
+		fields []*field
 	}
 )
 
 func defaultFieldOptions() *fieldOptions {
 	return &fieldOptions{
-		serializer: serializerUnknown,
+		options: defaultOptions(),
+
+		fields: make([]*field, 0, 0),
 	}
 }
