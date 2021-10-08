@@ -44,6 +44,22 @@ func (c *Client) ZRange(ctx context.Context, key string, values interface{}, opt
 	return
 }
 
+func (c *Client) ZRangeWithScores(ctx context.Context, key string, values []score, opts ...rangeOption) (err error) {
+	_options := defaultRangeOptions()
+	for _, opt := range opts {
+		opt.applyRange(_options)
+	}
+
+	if cmd := c.getClient(_options.options).ZRangeWithScores(ctx, key, _options.start, _options.stop); nil != cmd.Err() {
+		err = cmd.Err()
+	} else {
+		values = make([]score, 0, len(cmd.Val()))
+		// err = c.unmarshalSlice(cmd.Val(), values, _options.label, _options.serializer)
+	}
+
+	return
+}
+
 func (c *Client) ZRandMember(ctx context.Context, key string, values interface{}, opts ...countOption) (err error) {
 	_options := defaultCountOptions()
 	for _, opt := range opts {
