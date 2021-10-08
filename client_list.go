@@ -38,3 +38,18 @@ func (c *Client) LRange(ctx context.Context, key string, values interface{}, opt
 
 	return
 }
+
+func (c *Client) LLen(ctx context.Context, key string, opts ...option) (total int64, err error) {
+	_options := defaultOptions()
+	for _, opt := range opts {
+		opt.apply(_options)
+	}
+
+	if redisCmd := c.getClient(_options).LLen(ctx, key); nil != redisCmd.Err() {
+		err = redisCmd.Err()
+	} else {
+		total = redisCmd.Val()
+	}
+
+	return
+}
