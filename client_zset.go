@@ -53,7 +53,7 @@ func (c *Client) ZRandMember(ctx context.Context, key string, values interface{}
 	if cmd := c.getClient(_options.options).ZRandMember(ctx, key, _options.count, _options.withScores); nil != cmd.Err() {
 		err = cmd.Err()
 	} else {
-		err = c.unmarshalSlice(cmd.Val(), &values, _options.options.label, _options.options.serializer)
+		err = c.unmarshalSlice(cmd.Val(), values, _options.options.label, _options.options.serializer)
 	}
 
 	return
