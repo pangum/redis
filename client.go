@@ -1,6 +1,7 @@
 package redis
 
 import (
+	`context`
 	`encoding/json`
 	`encoding/xml`
 	`reflect`
@@ -29,6 +30,33 @@ func (c *Client) Redis(opts ...option) *redis.Client {
 	}
 
 	return c.getClient(_options)
+}
+
+func (c *Client) listPush(ctx context.Context, key string, pushType valuesType, opts ...valuesOption) (affected int64, err error) {
+	_options := defaultValuesOptions()
+	for _, opt := range opts {
+		opt.applyValues(_options)
+	}
+
+	values := make([]interface{}, 0, len(_options.values))
+	for _, value := range _options.values {
+		var marshaled interface{}
+		if marshaled, err = c.marshal(value, _options.label, _options.serializer); nil != err {
+			return
+		}
+
+		values = append(values, marshaled)
+	}
+
+	client := c.getClient(_options.options)
+	switch pushType {
+	case valuesTypeLPush:
+		affected, err = client.LPush(ctx, key, values...).Result()
+	case valuesTypeRPush:
+		affected, err = client.RPush(ctx, key, values...).Result()
+	}
+
+	return
 }
 
 func (c *Client) getClient(options *options) (client *redis.Client) {

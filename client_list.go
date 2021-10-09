@@ -4,24 +4,12 @@ import (
 	`context`
 )
 
+func (c *Client) LPush(ctx context.Context, key string, opts ...valuesOption) (affected int64, err error) {
+	return c.listPush(ctx, key, valuesTypeLPush, opts...)
+}
+
 func (c *Client) RPush(ctx context.Context, key string, opts ...valuesOption) (affected int64, err error) {
-	_options := defaultValuesOptions()
-	for _, opt := range opts {
-		opt.applyValues(_options)
-	}
-
-	values := make([]interface{}, 0, len(_options.values))
-	for _, value := range _options.values {
-		var marshaled interface{}
-		if marshaled, err = c.marshal(value, _options.label, _options.serializer); nil != err {
-			return
-		}
-
-		values = append(values, marshaled)
-	}
-	affected, err = c.getClient(_options.options).RPush(ctx, key, values...).Result()
-
-	return
+	return c.listPush(ctx, key, valuesTypeRPush, opts...)
 }
 
 func (c *Client) LRange(ctx context.Context, key string, values interface{}, opts ...rangeOption) (err error) {
