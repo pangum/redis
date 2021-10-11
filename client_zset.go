@@ -76,18 +76,7 @@ func (c *Client) ZRandMember(ctx context.Context, key string, values interface{}
 }
 
 func (c *Client) ZCard(ctx context.Context, key string, opts ...option) (total int64, err error) {
-	_options := defaultOptions()
-	for _, opt := range opts {
-		opt.apply(_options)
-	}
-
-	if redisCmd := c.getClient(_options).ZCard(ctx, key); nil != redisCmd.Err() {
-		err = redisCmd.Err()
-	} else {
-		total = redisCmd.Val()
-	}
-
-	return
+	return c.len(ctx, key, lenTypeZCard, opts...)
 }
 
 func (c *Client) ZCount(ctx context.Context, key string, opts ...intervalOption) (total int64, err error) {

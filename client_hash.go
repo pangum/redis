@@ -59,3 +59,13 @@ func (c *Client) HIncrBy(ctx context.Context, key string, field string, value in
 
 	return
 }
+
+func (c *Client) HDel(ctx context.Context, key string, field string, opts ...option) (affected int64, err error) {
+	_options := defaultOptions()
+	for _, opt := range opts {
+		opt.apply(_options)
+	}
+	affected, err = c.getClient(_options).HDel(ctx, key, field).Result()
+
+	return
+}
