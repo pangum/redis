@@ -50,22 +50,20 @@ func (c *Client) HGet(ctx context.Context, key string, field string, value inter
 	return
 }
 
-func (c *Client) HIncrBy(ctx context.Context, key string, field string, value int64, opts ...option) (affected int64, err error) {
+func (c *Client) HIncrBy(ctx context.Context, key string, field string, value int64, opts ...option) (int64, error) {
 	_options := defaultOptions()
 	for _, opt := range opts {
 		opt.apply(_options)
 	}
-	affected, err = c.getClient(_options).HIncrBy(ctx, key, field, value).Result()
 
-	return
+	return c.getClient(_options).HIncrBy(ctx, key, field, value).Result()
 }
 
-func (c *Client) HDel(ctx context.Context, key string, field string, opts ...option) (affected int64, err error) {
+func (c *Client) HDel(ctx context.Context, key string, field string, opts ...option) (int64, error) {
 	_options := defaultOptions()
 	for _, opt := range opts {
 		opt.apply(_options)
 	}
-	affected, err = c.getClient(_options).HDel(ctx, key, field).Result()
 
-	return
+	return c.getClient(_options).HDel(ctx, key, field).Result()
 }
