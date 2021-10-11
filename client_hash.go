@@ -50,6 +50,15 @@ func (c *Client) HGet(ctx context.Context, key string, field string, value inter
 	return
 }
 
+func (c *Client) HKeys(ctx context.Context, key string, opts ...option) (keys []string, err error) {
+	_options := defaultOptions()
+	for _, opt := range opts {
+		opt.apply(_options)
+	}
+
+	return c.getClient(_options).HKeys(ctx, key).Result()
+}
+
 func (c *Client) HIncrBy(ctx context.Context, key string, field string, value int64, opts ...option) (int64, error) {
 	_options := defaultOptions()
 	for _, opt := range opts {
