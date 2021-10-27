@@ -101,17 +101,27 @@ func (c *Client) unmarshal(from string, to interface{}, label string, serializer
 		toString := to.(*string)
 		*toString = from
 	case serializerInt:
-		to, err = strconv.Atoi(from)
+		toInt := to.(*int)
+		*toInt, err = strconv.Atoi(from)
 	case serializerInt64:
-		to, err = strconv.ParseInt(from, 10, 64)
+		toInt64 := to.(*int64)
+		*toInt64, err = strconv.ParseInt(from, 10, 64)
 	case serializerUint64:
-		to, err = strconv.ParseUint(from, 10, 64)
+		toUint64 := to.(*uint64)
+		*toUint64, err = strconv.ParseUint(from, 10, 64)
 	case serializerBool:
-		to, err = strconv.ParseBool(from)
+		toBool := to.(*bool)
+		*toBool, err = strconv.ParseBool(from)
 	case serializerFloat32:
-		to, err = strconv.ParseFloat(from, 32)
+		toFloat32 := to.(*float32)
+		if value, float32Err := strconv.ParseFloat(from, 32); nil == err {
+			*toFloat32 = float32(value)
+		} else {
+			err = float32Err
+		}
 	case serializerFloat64:
-		to, err = strconv.ParseFloat(from, 64)
+		toFloat64 := to.(*float64)
+		*toFloat64, err = strconv.ParseFloat(from, 64)
 	case serializerTime:
 		to, err = time.Parse(time.RFC3339Nano, from)
 	}
