@@ -2,29 +2,29 @@ package redis
 
 import (
 	`github.com/go-redis/redis/v8`
-	`github.com/storezhang/pangu`
+	`github.com/pangum/pangu`
 )
 
 func newRedis(config *pangu.Config) (client *Client, err error) {
-	panguConfig := new(panguConfig)
-	if err = config.Load(panguConfig); nil != err {
+	_panguConfig := new(panguConfig)
+	if err = config.Load(_panguConfig); nil != err {
 		return
 	}
 
-	redisConfig := panguConfig.Redis
+	redisConfig := _panguConfig.Redis
 
 	// 加载默认连接
 	optionsCache := make(map[string]*redis.Options)
 	serializerCache := make(map[string]serializer)
-	if "" != redisConfig.Addr {
-		defaultOptions := &redis.Options{
+	if `` != redisConfig.Addr {
+		_defaultOptions := &redis.Options{
 			Addr:     redisConfig.Addr,
 			Username: redisConfig.Options.Username,
 			Password: redisConfig.Options.Password,
 			DB:       redisConfig.Options.DB,
 		}
 
-		optionsCache[defaultLabel] = defaultOptions
+		optionsCache[defaultLabel] = _defaultOptions
 		serializerCache[defaultLabel] = redisConfig.Options.Serializer
 	}
 
