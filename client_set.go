@@ -39,6 +39,21 @@ func (c *Client) SCard(ctx context.Context, key string, opts ...option) (total i
 	return
 }
 
+func (c *Client) SMembers(ctx context.Context, key string, values interface{}, opts ...option) (err error) {
+	_options := defaultOptions()
+	for _, opt := range opts {
+		opt.apply(_options)
+	}
+
+	if cmd := c.getClient(_options).SMembers(ctx, key); nil != cmd.Err() {
+		err = cmd.Err()
+	} else {
+		err = c.unmarshalSlice(cmd.Val(), values, _options.label, _options.serializer)
+	}
+
+	return
+}
+
 func (c *Client) SRem(ctx context.Context, key string, opts ...valuesOption) (affected int64, err error) {
 	_options := defaultValuesOptions()
 	for _, opt := range opts {
