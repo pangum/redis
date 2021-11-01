@@ -1,4 +1,4 @@
-module github.com/storezhang/pangu-redis
+module github.com/pangum/redis
 
 go 1.16
 
