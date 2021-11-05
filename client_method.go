@@ -28,6 +28,8 @@ func (c *Client) addValues(ctx context.Context, key string, pushType addValuesTy
 		affected, err = client.LPush(ctx, key, values...).Result()
 	case addValuesTypeRPush:
 		affected, err = client.RPush(ctx, key, values...).Result()
+	case addValuesTypeSAdd:
+		affected, err = client.SAdd(ctx, key, values...).Result()
 	}
 
 	return

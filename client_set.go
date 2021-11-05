@@ -5,23 +5,7 @@ import (
 )
 
 func (c *Client) SAdd(ctx context.Context, key string, opts ...valuesOption) (affected int64, err error) {
-	_options := defaultValuesOptions()
-	for _, opt := range opts {
-		opt.applyValues(_options)
-	}
-
-	members := make([]interface{}, 0, len(_options.values))
-	for _, value := range _options.values {
-		var marshaled interface{}
-		if marshaled, err = c.marshal(value, _options.label, _options.serializer); nil != err {
-			return
-		}
-
-		members = append(members, marshaled)
-	}
-	affected, err = c.getClient(_options.options).SAdd(ctx, key, members...).Result()
-
-	return
+	return c.addValues(ctx, key, addValuesTypeSAdd, opts...)
 }
 
 func (c *Client) SCard(ctx context.Context, key string, opts ...option) (total int64, err error) {
