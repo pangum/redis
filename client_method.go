@@ -35,6 +35,27 @@ func (c *Client) addValues(ctx context.Context, key string, pushType addValuesTy
 	return
 }
 
+func (c *Client) _range(ctx context.Context, key string, values interface{}, rangeType rangeType, opts ...rangeOption) (err error) {
+	_options := defaultRangeOptions()
+	for _, opt := range opts {
+		opt.applyRange(_options)
+	}
+
+	var results []string
+	client := c.getClient(_options.options)
+	switch rangeType {
+	case rangeTypeLRange:
+		results, err = client.LRange(ctx, key, _options.start, _options.stop).Result()
+	case rangeTypeZRange:
+		results, err = client.ZRange(ctx, key, _options.start, _options.stop).Result()
+	}
+	if nil == err {
+		err = c.unmarshalSlice(results, values, _options.label, _options.serializer)
+	}
+
+	return
+}
+
 func (c *Client) len(ctx context.Context, key string, lenType lenType, opts ...option) (int64, error) {
 	_options := defaultOptions()
 	for _, opt := range opts {
