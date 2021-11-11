@@ -5,11 +5,11 @@ import (
 )
 
 func (c *Client) LPush(ctx context.Context, key string, opts ...valuesOption) (affected int64, err error) {
-	return c.addValues(ctx, key, addValuesTypeLPush, opts...)
+	return c.putValues(ctx, key, putValuesTypeLPush, opts...)
 }
 
 func (c *Client) RPush(ctx context.Context, key string, opts ...valuesOption) (affected int64, err error) {
-	return c.addValues(ctx, key, addValuesTypeRPush, opts...)
+	return c.putValues(ctx, key, putValuesTypeRPush, opts...)
 }
 
 func (c *Client) LRange(ctx context.Context, key string, values interface{}, opts ...rangeOption) (err error) {

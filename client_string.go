@@ -6,16 +6,16 @@ import (
 	`github.com/go-redis/redis/v8`
 )
 
-func (c *Client) Set(ctx context.Context, key string, value interface{}, opts ...option) (err error) {
-	_options := defaultOptions()
+func (c *Client) Set(ctx context.Context, key string, value interface{}, opts ...putOption) (err error) {
+	_options := defaultPutOptions()
 	for _, opt := range opts {
-		opt.apply(_options)
+		opt.applyPut(_options)
 	}
 
 	if value, err = c.marshal(value, _options.label, _options.serializer); nil != err {
 		return
 	}
-	err = c.getClient(_options).Set(ctx, key, value, _options.expiration).Err()
+	err = c.getClient(_options.options).Set(ctx, key, value, _options.expiration).Err()
 
 	return
 }

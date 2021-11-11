@@ -5,7 +5,7 @@ import (
 )
 
 func (c *Client) SAdd(ctx context.Context, key string, opts ...valuesOption) (affected int64, err error) {
-	return c.addValues(ctx, key, addValuesTypeSAdd, opts...)
+	return c.putValues(ctx, key, putValuesTypeSAdd, opts...)
 }
 
 func (c *Client) SCard(ctx context.Context, key string, opts ...option) (total int64, err error) {

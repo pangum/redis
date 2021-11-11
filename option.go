@@ -1,16 +1,5 @@
 package redis
 
-import (
-	`time`
-)
-
-func defaultOptions() *options {
-	return &options{
-		label:      defaultLabel,
-		expiration: -1,
-	}
-}
-
 type (
 	option interface {
 		apply(options *options)
@@ -19,6 +8,12 @@ type (
 	options struct {
 		label      string
 		serializer serializer
-		expiration time.Duration
 	}
 )
+
+func defaultOptions() *options {
+	return &options{
+		label:      defaultLabel,
+		serializer: serializerJson,
+	}
+}

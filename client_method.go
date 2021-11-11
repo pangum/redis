@@ -6,7 +6,7 @@ import (
 	`github.com/go-redis/redis/v8`
 )
 
-func (c *Client) addValues(ctx context.Context, key string, pushType addValuesType, opts ...valuesOption) (affected int64, err error) {
+func (c *Client) putValues(ctx context.Context, key string, pushType putValuesType, opts ...valuesOption) (affected int64, err error) {
 	_options := defaultValuesOptions()
 	for _, opt := range opts {
 		opt.applyValues(_options)
@@ -24,11 +24,11 @@ func (c *Client) addValues(ctx context.Context, key string, pushType addValuesTy
 
 	client := c.getClient(_options.options)
 	switch pushType {
-	case addValuesTypeLPush:
+	case putValuesTypeLPush:
 		affected, err = client.LPush(ctx, key, values...).Result()
-	case addValuesTypeRPush:
+	case putValuesTypeRPush:
 		affected, err = client.RPush(ctx, key, values...).Result()
-	case addValuesTypeSAdd:
+	case putValuesTypeSAdd:
 		affected, err = client.SAdd(ctx, key, values...).Result()
 	}
 
