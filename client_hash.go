@@ -38,7 +38,7 @@ func (c *Client) HGet(ctx context.Context, key string, field string, value inter
 
 	var cmd *redis.StringCmd
 	defer func() {
-		exist = redis.Nil != cmd.Err()
+		exist, err = c.checkNil(cmd.Err())
 	}()
 
 	if cmd = c.getClient(_options).HGet(ctx, key, field); nil != cmd.Err() {

@@ -145,6 +145,18 @@ func (c *Client) unmarshalSlice(strings []string, to interface{}, label string, 
 	return
 }
 
+func (c *Client) checkNil(redisErr error) (exist bool, err error) {
+	if nil == redisErr {
+		exist = true
+	} else if redis.Nil == redisErr {
+		exist = false
+	} else {
+		err = redisErr
+	}
+
+	return
+}
+
 func (c *Client) getSerializer(label string, original serializer) (serializer serializer) {
 	if serializerUnknown == original {
 		serializer = c.serializerCache[label]
